@@ -46,3 +46,34 @@ jobs:
             if (!approved) {
               core.setFailed("Код-рев'ю не схвалено");
             }
+
+      - name: Count lines of code with Cloc
+        run: |
+          sudo apt-get install -y cloc
+          cloc src/ > cloc-report.txt
+          cat cloc-report.txt
+
+      - name: Run SonarQube analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          unzip sonar-scanner-cli-4.8.0.2856-linux.zip
+          export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
+          sonar-scanner
+
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "GitHub Actions: CI Pipeline Report for ${{ github.repository }}"
+          to: "zatovskyg@gmail.com"
+          from: GitHub Actions
+          body: |
+            CI Pipeline completed!
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Status: All checks passed (Tests, Review Check, Cloc, SonarQube).
