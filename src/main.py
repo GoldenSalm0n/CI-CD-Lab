@@ -9,3 +9,9 @@ def read_root():
 @app.get("/calculate")
 def calculate(a: int, b: int):
     return {"result": a + b}
+
+def test_linter():
+    """Тестова функція з правильним форматуванням."""
+    x = 10
+    y = 20
+    return x + y
