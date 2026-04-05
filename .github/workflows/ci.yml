@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -30,14 +30,14 @@ jobs:
     needs: build
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check Approved Code Review
         uses: actions/github-script@v6
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const {data: reviews} = await github.pulls.listReviews({
+            const {data: reviews} = await github.rest.pulls.listReviews({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber
@@ -62,22 +62,6 @@ jobs:
           export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
           sonar-scanner
 
-      - name: Send email notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "GitHub Actions: CI Pipeline Report for ${{ github.repository }}"
-          to: "zatovskyg@gmail.com"
-          from: GitHub Actions
-          body: |
-            CI Pipeline completed!
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref }}
-            Status: All checks passed (Tests, Review Check, Cloc, SonarQube).
-            
       - name: Запуск flake8 через Reviewdog
         uses: reviewdog/action-flake8@v2
         with:
