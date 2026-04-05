@@ -10,7 +10,8 @@ def read_root():
 def calculate(a: int, b: int):
     return {"result": a + b}
 
-def bad_code_test( ):
-    a=   5
-    b =10
-    return a+ b
+def test_linter():
+    """Тестова функція з правильним форматуванням."""
+    x = 10
+    y = 20
+    return x + y
